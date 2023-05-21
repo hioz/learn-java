@@ -1,0 +1,42 @@
+plugins {
+    id 'java'
+}
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+def guavaVersion = '31.1-jre'
+def junitVersion = '5.9.2'
+def jqwikVersion = '1.7.2'
+def assertjVersion = '3.24.1'
+def jmockitVersion = '1.49'
+
+dependencies {
+	implementation "com.google.guava:guava:$guavaVersion"
+
+	testImplementation "org.junit.jupiter:junit-jupiter:$junitVersion"
+    testImplementation "net.jqwik:jqwik:$jqwikVersion"
+	testImplementation "org.assertj:assertj-core:$assertjVersion"
+	testImplementation "org.jmockit:jmockit:$jmockitVersion"
+}
+
+compileTestJava {
+    // jqwik: To enable argument names in reporting and debugging
+	options.compilerArgs += '-parameters'
+}
+
+test {
+	useJUnitPlatform {
+		includeEngines 'jqwik', 'junit-jupiter'
+	}
+
+	include '**/*Properties.class'
+	include '**/*Test.class'
+	include '**/*Tests.class'
+
+	jvmArgs "-javaagent:${classpath.find { it.name.contains("jmockit") }.absolutePath}"
+}
